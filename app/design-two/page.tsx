@@ -3,34 +3,39 @@
 /**
  * design-two · "THE REVEAL" — client container.
  *
- * Wraps everything in `.design-two-root` so the scoped dark tokens apply. Calls
- * the shared hooks (never fetches directly), owns the email input text, and
- * switches on analyze.state:
+ * Wraps everything in `.design-two-root` so the scoped dark tokens apply.
+ * Switches on analyze.state:
  *   idle         → HeroReveal + DropzoneReveal
- *   analyzing    → AnticipationLoader (onCancel = analyze.reset, hatch after 10s)
+ *   analyzing    → AnticipationLoader (onCancel = analyze.reset)
+ *   result       → redirect to /report/[analysisId] (full breakdown)
  *   uploadError  → ErrorPanelReveal (error = analyze.error)
  *   rateLimited  → ErrorPanelReveal (429 copy)
- *   result       → ResultReveal (vm + lead state/handlers)
  *
- * No statement data is persisted, logged, or placed in storage/URL; analysisId
- * lives only in memory inside the hook.
+ * The result is no longer shown inline — once extraction completes we navigate
+ * to the persisted report page so the user sees the full breakdown.
  */
 
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAnalyze } from '@/hooks/useAnalyze';
-import { useLead } from '@/hooks/useLead';
-import { toViewModel } from '@/lib/viewModel';
 import HeroReveal from './HeroReveal';
 import DropzoneReveal from './DropzoneReveal';
 import AnticipationLoader from './AnticipationLoader';
-import ResultReveal from './ResultReveal';
 import ErrorPanelReveal from './ErrorPanelReveal';
 
 export default function DesignTwoPage() {
   const analyze = useAnalyze();
-  const lead = useLead(analyze.result?.analysisId ?? null);
-  // The page owns the email text so it survives a retryable lead error.
-  const [email, setEmail] = useState('');
+  const router = useRouter();
+
+  // Once analysis succeeds, redirect to the full breakdown report.
+  useEffect(() => {
+    if (analyze.state === 'result' && analyze.result) {
+      router.push(`/report/${analyze.result.analysisId}`);
+    }
+  }, [analyze.state, analyze.result, router]);
+
+  // Keep the loader on screen during the result→navigation hand-off (no flash).
+  const showLoader = analyze.state === 'analyzing' || analyze.state === 'result';
 
   return (
     <main className="design-two-root flex flex-1 items-center justify-center px-5 py-12 font-sans sm:py-20">
@@ -48,25 +53,10 @@ export default function DesignTwoPage() {
           </div>
         )}
 
-        {analyze.state === 'analyzing' && <AnticipationLoader onCancel={analyze.reset} />}
+        {showLoader && <AnticipationLoader onCancel={analyze.reset} />}
 
         {(analyze.state === 'uploadError' || analyze.state === 'rateLimited') && analyze.error && (
           <ErrorPanelReveal error={analyze.error} onRetry={analyze.reset} />
-        )}
-
-        {analyze.state === 'result' && analyze.result && (
-          <ResultReveal
-            vm={toViewModel(analyze.result)}
-            leadState={lead.state}
-            leadError={lead.error}
-            emailError={lead.emailError}
-            onSubmitEmail={lead.submit}
-            onReset={analyze.reset}
-            onRecalculate={analyze.reset}
-            onLeadRetry={lead.reset}
-            email={email}
-            onEmailChange={setEmail}
-          />
         )}
       </div>
     </main>

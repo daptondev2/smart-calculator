@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npm test *)",
+      "Bash(rm -f app/_components/upload-form.tsx app/actions/analyze.ts app/report/'[id]'/page.tsx)",
+      "Bash(rmdir app/_components app/actions app/report/'[id]' app/report)",
+      "Bash(npx tsc *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/report/c90ec727-c53c-48a5-a1cc-2ce2a28dcdeb)",
+      "Bash(npx eslint *)"
+    ]
+  }
+}
