@@ -72,13 +72,28 @@ export function useCountUp(target: number, opts: CountUpOptions = {}): number {
   return value;
 }
 
-/** Stable currency formatter; falls back to USD on an invalid currency code. */
-export function makeMoneyFormatter(currency: string): (n: number) => string {
+/**
+ * Stable currency formatter; falls back to USD on an invalid currency code.
+ *
+ * `fractionDigits` (default 0) controls BOTH min and max fraction digits, so
+ * the result is either whole-dollar (0, the existing behavior used by the
+ * design-one/two/three demos) or fixed-cents (e.g. 2 for the report hero).
+ */
+export function makeMoneyFormatter(
+  currency: string,
+  fractionDigits = 0,
+): (n: number) => string {
+  const opts: Intl.NumberFormatOptions = {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  };
   let fmt: Intl.NumberFormat;
   try {
-    fmt = new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 0 });
+    fmt = new Intl.NumberFormat(undefined, opts);
   } catch {
-    fmt = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+    fmt = new Intl.NumberFormat(undefined, { ...opts, currency: 'USD' });
   }
   return (n: number) => fmt.format(n);
 }

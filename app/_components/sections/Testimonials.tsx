@@ -79,7 +79,7 @@ export function Testimonials() {
       aria-labelledby="testimonials-heading"
       className="relative px-5 py-20 font-sans sm:py-28"
     >
-      <div className="mx-auto flex w-full max-w-[1040px] flex-col items-center">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center">
         <p
           className="text-[11px] font-medium uppercase tracking-[0.16em]"
           style={{ color: 'var(--d2-trust)', animation: 'sc-fade-up 480ms var(--d2-ease-out) both' }}

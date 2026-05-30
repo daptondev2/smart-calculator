@@ -18,7 +18,7 @@ export function CalculatorSection() {
   const { open } = useCalculatorDialog();
 
   return (
-    <section id="calculator" className="relative px-5 py-24 sm:py-28">
+    <section id="calculator" className="relative px-5 py-20 sm:py-28">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-col items-center text-center">
           <span

@@ -39,7 +39,7 @@ export function Comparison() {
       aria-labelledby="comparison-heading"
       className="relative px-5 py-20 font-sans sm:py-28"
     >
-      <div className="mx-auto flex w-full max-w-[920px] flex-col items-center">
+      <div className="mx-auto flex w-full max-w-5xl flex-col items-center">
         {/* Eyebrow + heading */}
         <p
           className="text-[11px] font-medium uppercase tracking-[0.16em]"

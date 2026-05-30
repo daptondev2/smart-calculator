@@ -59,7 +59,7 @@ export function FeesVisualization() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="fees" className="relative overflow-hidden px-5 py-24 sm:py-28">
+    <section ref={sectionRef} id="fees" className="relative overflow-hidden px-5 py-20 sm:py-28">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mx-auto max-w-2xl text-center">
@@ -74,7 +74,7 @@ export function FeesVisualization() {
             <span className="font-mono tabular-nums" style={{ color: 'var(--d2-text)' }}>
               {stripeRateLabel}
             </span>{' '}
-            on every successful charge. EPD takes a flat{' '}
+            on every successful charge. EPD takes{' '}
             <span className="font-mono tabular-nums" style={{ color: 'var(--d2-reveal)' }}>
               {epdRateLabel}
             </span>{' '}
@@ -166,7 +166,7 @@ export function FeesVisualization() {
             </span>{' '}
             of the sale &mdash; before the percentage rate is even added. High
             transaction counts and smaller tickets are exactly where it
-            compounds. EPD&rsquo;s flat{' '}
+            compounds. EPD&rsquo;s{' '}
             <span className="font-mono tabular-nums" style={{ color: 'var(--d2-reveal)' }}>
               {epdRateLabel}
             </span>{' '}
