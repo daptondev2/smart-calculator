@@ -20,6 +20,9 @@ type Transaction = {
   is_refund: boolean;
 };
 
+const money0 = (n: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n ?? 0);
+
 function fmtPeriod(start?: string | null, end?: string | null): string {
   if (!start || !end) return "your statement";
   const f = (iso: string) => {
@@ -72,99 +75,120 @@ export default async function ReportPage({ params }: PageProps) {
   const monthlySaving = typeof a.monthly_saving === "number" ? a.monthly_saving : report.savings;
   const periodText = fmtPeriod(a.period_start, a.period_end);
   const positive = report.savings > 0;
-
   const annualSavingText = formatCurrency(annualSaving);
+
+  // EPD cost as a share of Stripe's (drives the donut + center figure).
+  const epdShare = report.stripe_fees > 0 ? report.epd_fees / report.stripe_fees : 1;
 
   return (
     <Shell>
       {/* ---- Header ---- */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-sans text-sm font-semibold" style={{ color: "var(--d2-text)" }}>
-          Your EPD savings report
-        </p>
-        <p className="font-sans text-xs" style={{ color: "var(--d2-muted)" }}>
-          {statement.file_name} · {periodText}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-col gap-3">
+          <span
+            className="inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1 font-sans text-[11px] font-semibold uppercase tracking-[0.16em]"
+            style={{ borderColor: "color-mix(in srgb, var(--d2-reveal) 45%, var(--d2-border))", color: "var(--d2-reveal)" }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: "var(--d2-reveal)", boxShadow: "0 0 8px var(--d2-reveal)" }} />
+            Analysis complete
+          </span>
+          <h1 className="font-sans text-3xl font-bold tracking-tight" style={{ color: "var(--d2-text)" }}>
+            Your EPD savings report
+          </h1>
+        </div>
+        <p className="pt-1 text-right font-mono text-xs leading-relaxed" style={{ color: "var(--d2-muted)" }}>
+          {periodText}
+          <br />
+          {statement.file_name}
         </p>
       </div>
 
-      {/* ---- Side-by-side comparison — the centerpiece ---- */}
-      <div className="flex flex-col gap-6">
-        {/* Savings headline sitting above the two cards */}
-        <div className="text-center">
-          <p className="font-sans text-sm font-medium" style={{ color: "var(--d2-text2)" }}>
-            {positive ? "You could save with EPD" : "You're already on a competitive rate"}
-          </p>
-          {positive ? (
-            <>
-              <p className="mt-2 font-mono text-5xl font-bold tabular-nums leading-none sm:text-6xl" style={{ color: "var(--d2-reveal)" }}>
-                {annualSavingText}
-                <span className="ml-1.5 font-sans text-xl font-medium" style={{ color: "var(--d2-text2)" }}>/year</span>
-              </p>
-              <p className="mt-2 font-sans text-sm" style={{ color: "var(--d2-text2)" }}>
-                {formatCurrency(monthlySaving)}/month · {formatPercent(report.savings_pct)} lower than Stripe today
-              </p>
-            </>
-          ) : (
-            <p className="mx-auto mt-2 max-w-[44ch] font-sans text-base" style={{ color: "var(--d2-text2)" }}>
-              On this statement EPD wouldn&apos;t beat your current rate by much — we won&apos;t pretend otherwise. A
-              specialist can still review your full setup.
+      {/* ---- Hero row: savings card + stacked summary ---- */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        {/* Big savings + donut */}
+        <div
+          className="relative flex flex-col gap-6 overflow-hidden rounded-[24px] border p-7 lg:col-span-2"
+          style={{
+            background: "linear-gradient(155deg, color-mix(in srgb, var(--d2-reveal) 12%, var(--d2-elevated)) 0%, var(--d2-elevated) 60%)",
+            borderColor: positive ? "color-mix(in srgb, var(--d2-reveal) 35%, var(--d2-border))" : "var(--d2-border)",
+            boxShadow: positive ? "0 0 100px -40px var(--d2-reveal)" : "none",
+          }}
+        >
+          <div className="flex flex-col gap-2">
+            <p className="font-sans text-sm" style={{ color: "var(--d2-text2)" }}>
+              {positive ? "You could save with EPD" : "You're already on a competitive rate"}
             </p>
-          )}
+            {positive ? (
+              <>
+                <div className="flex items-end gap-1">
+                  <span className="font-mono text-6xl font-bold tabular-nums leading-none sm:text-7xl" style={{ color: "var(--d2-reveal)" }}>
+                    {annualSavingText}
+                  </span>
+                  <span className="mb-1 font-sans text-2xl font-medium" style={{ color: "var(--d2-text2)" }}>/yr</span>
+                </div>
+                <div className="h-[3px] w-44 rounded-full" style={{ background: "linear-gradient(90deg, var(--d2-reveal), transparent)" }} />
+                <p className="font-sans text-sm" style={{ color: "var(--d2-text2)" }}>
+                  {formatCurrency(monthlySaving)}/month ·{" "}
+                  <span className="font-semibold" style={{ color: "var(--d2-reveal)" }}>{formatPercent(report.savings_pct)} lower</span> than Stripe today
+                </p>
+              </>
+            ) : (
+              <p className="max-w-[42ch] font-sans text-base" style={{ color: "var(--d2-text2)" }}>
+                On this statement EPD wouldn&apos;t beat your current rate by much — we won&apos;t pretend otherwise.
+              </p>
+            )}
+          </div>
+
+          {/* Donut + legend */}
+          <div className="flex flex-wrap items-center gap-6">
+            <Donut share={epdShare} />
+            <div className="flex flex-col gap-2.5">
+              <LegendRow color="var(--d2-none)" label="Stripe fees" value={formatCurrency(report.stripe_fees)} />
+              <LegendRow color="var(--d2-reveal)" label="EPD fees" value={formatCurrency(report.epd_fees)} />
+              <LegendRow color="var(--d2-positive)" label="You keep" value={formatCurrency(report.savings)} strong />
+            </div>
+          </div>
         </div>
 
-        {/* The two cards, side by side on desktop */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <CompareCard
+        {/* Stacked Stripe / EPD / Saved summary */}
+        <div className="flex flex-col divide-y rounded-[24px] border" style={{ ...cardStyle(), borderColor: "var(--d2-border)" }}>
+          <SummaryBlock
             tag="Stripe today"
             amount={formatCurrency(report.stripe_fees)}
-            rate="2.9% + $0.30 per charge"
-            sub={`${formatPercent(report.stripe_effective_rate)} effective rate`}
+            sub={`2.9% + $0.30 · ${formatPercent(report.stripe_effective_rate)} effective`}
           />
-          <CompareCard
+          <SummaryBlock
             tag="With EPD"
             amount={formatCurrency(report.epd_fees)}
-            rate="Flat 1.5%, no per-charge fee"
-            sub={`${formatPercent(report.epd_rate)} effective rate`}
-            highlight
-            badge={positive ? `You save ${formatCurrency(report.savings)} this period` : undefined}
+            sub={`Flat 1.5% · ${formatPercent(report.epd_rate)} effective`}
+            accent
+          />
+          <SummaryBlock
+            tag="Saved this period"
+            amount={`+${formatCurrency(report.savings)}`}
+            sub={`${formatPercent(report.savings_pct)} reduction in processing cost`}
+            accent
           />
         </div>
-
-        <p className="text-center font-sans text-xs" style={{ color: "var(--d2-muted)" }}>
-          Same {formatCurrency(report.total_volume)} of volume across {report.transaction_count} transactions — only the fees change.
-        </p>
       </div>
 
-      {/* ---- Why EPD ---- */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Value title="Flat 1.5%" body="One simple rate on every charge. No 2.9% + 30¢ stacking up on small tickets." />
-        <Value title="Same volume, less cost" body="Nothing changes about how you sell — only what you pay to process." />
-        <Value title="Switch in days" body="A specialist handles the move and confirms your numbers on a quick call." />
+      {/* ---- Stat row ---- */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat label="Volume" value={money0(report.total_volume)} sub="gross charges" />
+        <Stat label="Transactions" value={String(report.transaction_count)} sub="this period" />
+        <Stat label="Per-charge fee" value={money0(PRICING.EPD_FIXED)} sub={`vs ${money0(PRICING.STRIPE_FIXED)} on Stripe`} accent />
+        <Stat label="Projected / mo" value={formatCurrency(monthlySaving)} sub="ongoing savings" accent />
       </div>
 
-      {/* ---- Conversion CTA ---- */}
-      <JoinEpd analysisId={statement.id} annualSavingText={annualSavingText} positive={positive} />
-
-      {/* ---- Full breakdown (collapsible) ---- */}
-      <details className="group rounded-[20px] border p-6" style={cardStyle()}>
-        <summary className="flex cursor-pointer list-none items-center justify-between font-sans text-sm font-semibold" style={{ color: "var(--d2-text)" }}>
-          See the full transaction breakdown
-          <span className="font-mono text-xs transition-transform group-open:rotate-90" style={{ color: "var(--d2-muted)" }}>▶</span>
-        </summary>
-
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <Stat label="Processing volume" value={formatCurrency(report.total_volume)} />
-          <Stat label="Transactions" value={String(report.transaction_count)} />
-          <Stat label="Stripe fees (2.9% + $0.30)" value={formatCurrency(report.stripe_fees)} sub={`${formatPercent(report.stripe_effective_rate)} effective`} />
-          <Stat label="EPD fees (flat 1.5%)" value={formatCurrency(report.epd_fees)} sub={formatPercent(report.epd_rate)} />
-          <Stat label="Savings this period" value={formatCurrency(report.savings)} sub={formatPercent(report.savings_pct)} accent />
-          <Stat label="Projected / month" value={formatCurrency(monthlySaving)} accent />
-        </div>
-
-        <div className="mt-4 overflow-x-auto rounded-[14px] border" style={{ borderColor: "var(--d2-border)" }}>
+      {/* ---- Full transaction breakdown ---- */}
+      <div className="flex flex-col gap-4 rounded-[20px] border p-6" style={cardStyle()}>
+        <h2 className="font-sans text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--d2-muted)" }}>
+          Full transaction breakdown
+        </h2>
+        <div className="overflow-x-auto">
           <table className="w-full text-left font-sans text-sm">
             <thead>
-              <tr style={{ background: "var(--d2-elevated2)", color: "var(--d2-text2)" }}>
+              <tr style={{ color: "var(--d2-muted)" }}>
                 <Th>Date</Th>
                 <Th>Description</Th>
                 <Th className="text-right">Amount</Th>
@@ -195,13 +219,16 @@ export default async function ReportPage({ params }: PageProps) {
             </tbody>
           </table>
         </div>
+      </div>
 
-        <p className="mt-3 font-sans text-xs leading-relaxed" style={{ color: "var(--d2-muted)" }}>
-          Stripe fees are recomputed from the standard 2.9% + $0.30 formula on gross charge volume; EPD applies a flat
-          1.5%. Refunds are excluded from fee math. Figures annualized over the statement period.
-        </p>
-      </details>
+      {/* ---- Conversion CTA ---- */}
+      <JoinEpd analysisId={statement.id} annualSavingText={annualSavingText} positive={positive} />
 
+      {/* ---- Methodology + back ---- */}
+      <p className="font-sans text-xs leading-relaxed" style={{ color: "var(--d2-muted)" }}>
+        Stripe fees recomputed from the standard 2.9% + $0.30 formula on gross charge volume; EPD applies a flat 1.5%.
+        Refunds excluded from fee math. Figures annualized over the statement period.
+      </p>
       <BackLink />
     </Shell>
   );
@@ -216,72 +243,72 @@ function cardStyle(): React.CSSProperties {
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="design-two-root flex flex-1 justify-center px-5 py-10 font-sans sm:py-14">
-      <div className="flex w-full max-w-3xl flex-col gap-5">{children}</div>
+      <div className="flex w-full max-w-[980px] flex-col gap-5">{children}</div>
     </main>
   );
 }
 
-/** One side of the Stripe-vs-EPD comparison. `highlight` greens the EPD card. */
-function CompareCard({
-  tag,
-  amount,
-  rate,
-  sub,
-  highlight,
-  badge,
-}: {
-  tag: string;
-  amount: string;
-  rate: string;
-  sub: string;
-  highlight?: boolean;
-  badge?: string;
-}) {
+/** Pure-SVG donut: green arc = EPD cost as a share of Stripe's. */
+function Donut({ share }: { share: number }) {
+  const size = 150;
+  const stroke = 16;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const clamped = Math.min(1, Math.max(0, share));
+  const arc = clamped * c;
+  const pct = Math.round(clamped * 100);
+  const center = size / 2;
   return (
-    <div
-      className="flex flex-col gap-2 rounded-[18px] border px-6 py-7"
-      style={{
-        background: highlight ? "color-mix(in srgb, var(--d2-reveal) 8%, var(--d2-elevated))" : "var(--d2-elevated)",
-        borderColor: highlight ? "color-mix(in srgb, var(--d2-reveal) 40%, var(--d2-border))" : "var(--d2-border)",
-      }}
-    >
-      <span className="font-sans text-xs font-semibold uppercase tracking-wide" style={{ color: highlight ? "var(--d2-reveal)" : "var(--d2-muted)" }}>
-        {tag}
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <circle cx={center} cy={center} r={r} fill="none" stroke="var(--d2-elevated2)" strokeWidth={stroke} />
+      <circle
+        cx={center}
+        cy={center}
+        r={r}
+        fill="none"
+        stroke="var(--d2-reveal)"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={`${arc} ${c - arc}`}
+        transform={`rotate(-90 ${center} ${center})`}
+      />
+      <text x={center} y={center - 2} textAnchor="middle" className="font-mono" style={{ fontSize: 30, fontWeight: 700, fill: "var(--d2-text)" }}>
+        {pct}%
+      </text>
+      <text x={center} y={center + 18} textAnchor="middle" className="font-sans" style={{ fontSize: 11, fill: "var(--d2-muted)" }}>
+        of Stripe cost
+      </text>
+    </svg>
+  );
+}
+
+function LegendRow({ color, label, value, strong }: { color: string; label: string; value: string; strong?: boolean }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="h-3 w-3 shrink-0 rounded-[4px]" style={{ background: color }} />
+      <span className="w-20 font-sans text-sm" style={{ color: "var(--d2-text2)" }}>{label}</span>
+      <span className="font-mono text-sm tabular-nums" style={{ color: strong ? "var(--d2-reveal)" : "var(--d2-text)", fontWeight: strong ? 600 : 400 }}>
+        {value}
       </span>
-      <span className="font-mono text-4xl font-bold tabular-nums leading-none" style={{ color: highlight ? "var(--d2-reveal)" : "var(--d2-text)" }}>
-        {amount}
-      </span>
-      <span className="font-sans text-sm font-medium" style={{ color: "var(--d2-text)" }}>{rate}</span>
-      <span className="font-sans text-xs" style={{ color: "var(--d2-muted)" }}>{sub}</span>
-      {badge ? (
-        <span className="mt-2 inline-flex w-fit items-center gap-1 rounded-full px-3 py-1 font-sans text-xs font-semibold" style={{ background: "var(--d2-reveal)", color: "#06121f" }}>
-          ✓ {badge}
-        </span>
-      ) : null}
     </div>
   );
 }
 
-function Value({ title, body }: { title: string; body: string }) {
+function SummaryBlock({ tag, amount, sub, accent }: { tag: string; amount: string; sub: string; accent?: boolean }) {
   return (
-    <div className="flex flex-col gap-1 rounded-[16px] border p-4" style={cardStyle()}>
-      <span className="font-sans text-sm font-bold" style={{ color: "var(--d2-reveal)" }}>{title}</span>
-      <span className="font-sans text-xs leading-relaxed" style={{ color: "var(--d2-text2)" }}>{body}</span>
+    <div className="flex flex-col gap-1 px-6 py-5" style={{ borderColor: "var(--d2-border)" }}>
+      <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--d2-muted)" }}>{tag}</span>
+      <span className="font-mono text-3xl font-bold tabular-nums leading-none" style={{ color: accent ? "var(--d2-reveal)" : "var(--d2-text)" }}>{amount}</span>
+      <span className="font-mono text-xs" style={{ color: "var(--d2-muted)" }}>{sub}</span>
     </div>
   );
 }
 
 function Stat({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: boolean }) {
   return (
-    <div
-      className="flex flex-col gap-1 rounded-[14px] border px-4 py-4"
-      style={{
-        background: "var(--d2-bg)",
-        borderColor: accent ? "color-mix(in srgb, var(--d2-reveal) 40%, var(--d2-border))" : "var(--d2-border)",
-      }}
-    >
-      <span className="font-sans text-xs" style={{ color: "var(--d2-muted)" }}>{label}</span>
-      <span className="font-mono text-xl font-semibold tabular-nums" style={{ color: accent ? "var(--d2-reveal)" : "var(--d2-text)" }}>{value}</span>
+    <div className="flex flex-col gap-1 rounded-[16px] border px-5 py-4" style={cardStyle()}>
+      <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--d2-muted)" }}>{label}</span>
+      <span className="font-mono text-2xl font-bold tabular-nums" style={{ color: accent ? "var(--d2-reveal)" : "var(--d2-text)" }}>{value}</span>
       {sub ? <span className="font-sans text-xs" style={{ color: "var(--d2-text2)" }}>{sub}</span> : null}
     </div>
   );
