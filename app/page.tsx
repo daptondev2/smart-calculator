@@ -1,21 +1,39 @@
-import { UploadForm } from "@/app/_components/upload-form";
+import { Footer } from "@/app/_components/ui/Footer";
+import { Hero } from "@/app/_components/sections/Hero";
+import { FeesVisualization } from "@/app/_components/sections/FeesVisualization";
+import { CalculatorSection } from "@/app/_components/sections/CalculatorSection";
+import { Comparison } from "@/app/_components/sections/Comparison";
+import { Testimonials } from "@/app/_components/sections/Testimonials";
+import { LeadCapture } from "@/app/_components/sections/LeadCapture";
+import { FAQ } from "@/app/_components/sections/FAQ";
+import { FinalCTA } from "@/app/_components/sections/FinalCTA";
 
+/**
+ * Home — the EPD Smart Calculator landing page.
+ *
+ * Section division mirrors the agreed structure (hero → fees → calculator →
+ * comparison → testimonials → lead capture → FAQ → final CTA → footer), styled
+ * entirely in the design-two "reveal" dark theme. The whole page is wrapped in
+ * `.design-two-root` so the scoped --d2-* tokens apply.
+ *
+ * The real calculator is the global upload dialog (mounted in layout.tsx);
+ * section CTAs open it via useCalculatorDialog(). No top navbar (removed by
+ * request).
+ */
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 font-sans dark:bg-black">
-      <main className="flex w-full max-w-2xl flex-col items-center gap-8 rounded-2xl bg-white p-10 shadow-sm dark:bg-zinc-950">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <h1 className="text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
-            How much could you save with EPD?
-          </h1>
-          <p className="max-w-md text-zinc-600 dark:text-zinc-400">
-            Upload your Stripe processing statement. We&apos;ll recompute
-            Stripe&apos;s fees (2.9% + $0.30) and compare them against EPD&apos;s
-            flat 1.5% to show your potential savings.
-          </p>
-        </div>
-        <UploadForm />
+    <div className="design-two-root font-sans">
+      <main>
+        <Hero />
+        <FeesVisualization />
+        <CalculatorSection />
+        <Comparison />
+        <Testimonials />
+        <LeadCapture />
+        <FAQ />
+        <FinalCTA />
       </main>
+      <Footer />
     </div>
   );
 }
