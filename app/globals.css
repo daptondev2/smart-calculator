@@ -24,3 +24,111 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ============================================================== */
+/* Shared keyframes — CSS-only motion for all design variants.    */
+/* (The only JS animation allowed is lib/motion.ts useCountUp.)   */
+/* ============================================================== */
+@keyframes sc-fade-up   { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes sc-fade-in   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sc-bar-grow  { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes sc-spin      { to { transform: rotate(360deg); } }
+@keyframes sc-pulse     { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+@keyframes sc-shake     { 10%, 90% { transform: translateX(-1px); } 30%, 70% { transform: translateX(2px); } 50% { transform: translateX(-3px); } }
+@keyframes sc-shockwave { from { opacity: 0.5; transform: scale(0.2); } to { opacity: 0; transform: scale(2.2); } }
+@keyframes sc-float     { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes sc-scanline  { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+@keyframes sc-draw      { to { stroke-dashoffset: 0; } }
+@keyframes sc-sweep     { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
+@keyframes sc-bloom     { 0% { opacity: 0; } 35% { opacity: 0.55; } 100% { opacity: 0; } }
+@keyframes sc-settle    { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
+
+/* Global reduced-motion guard: neutralizes all CSS animation/transition. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================== */
+/* Per-variant scoped token blocks. Each design route wraps its    */
+/* content in `.design-X-root`; tokens never collide and each      */
+/* variant is independently themeable (a variant may be dark while */
+/* the global default stays light). Agents consume via             */
+/* `bg-[var(--d1-surface)]` or the literal hex in the spec.        */
+/* ============================================================== */
+
+/* ---- design-one · "THE AUDIT" (light, statement-like) ---- */
+.design-one-root {
+  color-scheme: light;
+  min-height: 100dvh;
+  background: #f7f8fa;
+  color: #0f1623;
+  --d1-canvas: #f7f8fa;
+  --d1-surface: #ffffff;
+  --d1-surface2: #f1f3f6;
+  --d1-border: #e2e6ec;
+  --d1-ink: #0f1623;
+  --d1-ink2: #4a5568;
+  --d1-ink3: #7a8699;
+  --d1-trust: #143a5a;
+  --d1-trust2: #1e5a8a;
+  --d1-gain: #0e7a4b;
+  --d1-steady: #3d4757;
+  --d1-warn: #9a6b00;
+  --d1-error: #b23b3b;
+  --d1-bar-current: #8a93a6;
+  --d1-bar-epd: #0e7a4b;
+  --d1-ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+/* ---- design-two · "THE REVEAL" (dark, verified terminal) ---- */
+.design-two-root {
+  color-scheme: dark;
+  min-height: 100dvh;
+  background: #0a0e14;
+  color: #f2f5fa;
+  --d2-bg: #0a0e14;
+  --d2-elevated: #121822;
+  --d2-elevated2: #1a2230;
+  --d2-border: #26303f;
+  --d2-text: #f2f5fa;
+  --d2-text2: #9aa7bd;
+  --d2-muted: #5e6b82;
+  --d2-reveal: #3df5a0;
+  --d2-reveal-deep: #10b981;
+  --d2-trust: #4d8dff;
+  --d2-warn: #f5b83d;
+  --d2-error: #ff6b6b;
+  --d2-positive: #7fd8a8;
+  --d2-none: #8fa3c2;
+  --d2-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- design-three · "THE STRAIGHT LINE" (warm light, calm) ---- */
+.design-three-root {
+  color-scheme: light;
+  min-height: 100dvh;
+  background: #fbfbfa;
+  color: #16181d;
+  --d3-bg: #fbfbfa;
+  --d3-surface: #ffffff;
+  --d3-ink: #16181d;
+  --d3-ink-soft: #5a6069;
+  --d3-ink-faint: #9aa0a8;
+  --d3-line: #ecece8;
+  --d3-brand: #1e6b5c;
+  --d3-brand-strong: #175547;
+  --d3-brand-tint: #eaf3f0;
+  --d3-celebrate: #0f8f6f;
+  --d3-info: #3a6ea5;
+  --d3-warn: #9a6b12;
+  --d3-warn-tint: #fbf4e6;
+  --d3-focus: #2d8fe0;
+  --d3-ease-calm: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
