@@ -93,7 +93,7 @@ export default async function ReportPage({ params }: PageProps) {
             Analysis complete
           </span>
           <h1 className="font-sans text-3xl font-bold tracking-tight" style={{ color: "var(--d2-text)" }}>
-            Your EPD savings report
+            Your savings report
           </h1>
         </div>
         <p className="pt-1 text-right font-mono text-xs leading-relaxed" style={{ color: "var(--d2-muted)" }}>
@@ -116,7 +116,7 @@ export default async function ReportPage({ params }: PageProps) {
         >
           <div className="flex flex-col gap-2">
             <p className="font-sans text-sm" style={{ color: "var(--d2-text2)" }}>
-              {positive ? "You could save with EPD" : "You're already on a competitive rate"}
+              {positive ? "You could save by switching" : "You're already on a competitive rate"}
             </p>
             {positive ? (
               <>
@@ -134,7 +134,7 @@ export default async function ReportPage({ params }: PageProps) {
               </>
             ) : (
               <p className="max-w-[42ch] font-sans text-base" style={{ color: "var(--d2-text2)" }}>
-                On this statement EPD wouldn&apos;t beat your current rate by much — we won&apos;t pretend otherwise.
+                On this statement the flat-rate plan wouldn&apos;t beat your current rate by much — we won&apos;t pretend otherwise.
               </p>
             )}
           </div>
@@ -144,7 +144,7 @@ export default async function ReportPage({ params }: PageProps) {
             <Donut share={epdShare} />
             <div className="flex flex-col gap-2.5">
               <LegendRow color="var(--d2-none)" label="Stripe fees" value={formatCurrency(report.stripe_fees)} />
-              <LegendRow color="var(--d2-reveal)" label="EPD fees" value={formatCurrency(report.epd_fees)} />
+              <LegendRow color="var(--d2-reveal)" label="Flat-rate fees" value={formatCurrency(report.epd_fees)} />
               <LegendRow color="var(--d2-positive)" label="You keep" value={formatCurrency(report.savings)} strong />
             </div>
           </div>
@@ -158,7 +158,7 @@ export default async function ReportPage({ params }: PageProps) {
             sub={`2.9% + $0.30 · ${formatPercent(report.stripe_effective_rate)} effective`}
           />
           <SummaryBlock
-            tag="With EPD"
+            tag="Flat-rate plan"
             amount={formatCurrency(report.epd_fees)}
             sub={`Flat 1.5% · ${formatPercent(report.epd_rate)} effective`}
             accent
@@ -194,7 +194,7 @@ export default async function ReportPage({ params }: PageProps) {
                 <Th className="text-right">Amount</Th>
                 <Th className="text-right">Qty</Th>
                 <Th className="text-right">Stripe fee</Th>
-                <Th className="text-right">EPD fee</Th>
+                <Th className="text-right">Flat-rate fee</Th>
               </tr>
             </thead>
             <tbody>
@@ -226,7 +226,7 @@ export default async function ReportPage({ params }: PageProps) {
 
       {/* ---- Methodology + back ---- */}
       <p className="font-sans text-xs leading-relaxed" style={{ color: "var(--d2-muted)" }}>
-        Stripe fees recomputed from the standard 2.9% + $0.30 formula on gross charge volume; EPD applies a flat 1.5%.
+        Stripe fees recomputed from the standard 2.9% + $0.30 formula on gross charge volume; the flat-rate plan applies a flat 1.5%.
         Refunds excluded from fee math. Figures annualized over the statement period.
       </p>
       <BackLink />

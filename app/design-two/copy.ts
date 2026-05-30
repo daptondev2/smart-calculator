@@ -40,7 +40,7 @@ export const LOADER = {
     'Reading your statement…',
     'Found your processing volume…',
     'Pulling your effective rate…',
-    'Comparing against EPD pricing…',
+    'Comparing against flat-rate pricing…',
     'Calculating your annual savings…',
   ],
   cancel: 'Cancel',
@@ -48,14 +48,14 @@ export const LOADER = {
 
 export const RESULT = {
   kicker: "Here's your number.",
-  hotLabel: 'ESTIMATED ANNUAL SAVINGS WITH EPD',
-  positiveLabel: 'ESTIMATED ANNUAL SAVINGS WITH EPD',
+  hotLabel: 'ESTIMATED ANNUAL SAVINGS',
+  positiveLabel: 'ESTIMATED ANNUAL SAVINGS',
   hotSub: "That's real money you're leaving on the table.",
   positiveSub: "A solid, real saving — and there's usually more once we review.",
   noneHeading: "You're already on a competitive rate.",
   noneSub: "so we won't pretend there is. You're in good shape.",
-  hotCta: 'Talk to an EPD specialist →',
-  positiveCta: 'Talk to an EPD specialist →',
+  hotCta: 'Talk to a specialist →',
+  positiveCta: 'Talk to a specialist →',
   noneCta: 'Get a tailored review →',
   disclosureHeading: 'How is this estimated?',
   recalculate: 'Start over with a new statement',
@@ -67,15 +67,15 @@ export function anchorLine(periodText: string): string {
 
 export function disclosureBody(periodText: string): string {
   const period = periodText || 'statement';
-  return `Read from your ${period} statement, compared to EPD pricing on the same volume, annualized over your statement's dates. Conservative; confirmed on a call. Never stored.`;
+  return `Read from your ${period} statement, compared to flat-rate pricing on the same volume, annualized over your statement's dates. Conservative; confirmed on a call. Never stored.`;
 }
 
 export function noneDiff(pctSavingText: string): string {
-  return `Difference from EPD ≈ ${pctSavingText}.`;
+  return `Difference from the flat-rate plan ≈ ${pctSavingText}.`;
 }
 
 export const GATE = {
-  label: 'Where should an EPD specialist reach you?',
+  label: 'Where should a specialist reach you?',
   placeholder: 'you@business.com',
   micro: 'A specialist reaches out once. No spam, no obligation.',
   successHeading: 'Done. A specialist will reach out to',

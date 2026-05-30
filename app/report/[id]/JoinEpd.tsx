@@ -66,7 +66,7 @@ export default function JoinEpd({
         <div className="flex flex-col">
           <h3 className="font-sans text-xl font-bold" style={{ color: 'var(--d2-text)' }}>You&apos;re in. 🎉</h3>
           <p className="font-sans text-sm" style={{ color: 'var(--d2-text2)' }}>
-            An EPD specialist will reach out to <span style={{ color: 'var(--d2-text)' }}>{email.trim()}</span> to lock in your flat 1.5% rate.
+            A specialist will reach out to <span style={{ color: 'var(--d2-text)' }}>{email.trim()}</span> to lock in your flat 1.5% rate.
           </p>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function JoinEpd({
     <div className="flex flex-col gap-5 rounded-[22px] border px-7 py-7 sm:flex-row sm:items-center sm:justify-between" style={bannerStyle}>
       <div className="flex max-w-[42ch] flex-col gap-1">
         <h3 className="font-sans text-2xl font-bold tracking-tight" style={{ color: 'var(--d2-text)' }}>
-          {positive ? 'Ready to keep that money?' : 'Get a tailored EPD review'}
+          {positive ? 'Ready to keep that money?' : 'Get a tailored review'}
         </h3>
         <p className="font-sans text-sm" style={{ color: 'var(--d2-text2)' }}>
           {positive
@@ -105,7 +105,7 @@ export default function JoinEpd({
             className="shrink-0 rounded-[12px] px-6 py-3 font-sans text-sm font-semibold transition-opacity disabled:opacity-60"
             style={{ background: 'var(--d2-reveal)', color: '#06121f' }}
           >
-            {state === 'submitting' ? 'Joining…' : 'Join EPD →'}
+            {state === 'submitting' ? 'Joining…' : 'Get started →'}
           </button>
         </div>
         {emailError ? <span className="font-sans text-xs" style={{ color: 'var(--d2-error)' }}>{emailError}</span> : null}
