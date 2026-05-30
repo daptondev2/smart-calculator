@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+> **Project knowledge pack:** see [`docs/`](./docs/README.md) for the EPD Savings Calculator product context, backend architecture, API contract, and the frontend integration task. Start with [`docs/README.md`](./docs/README.md).
+
 ## Getting Started
 
 First, run the development server:
